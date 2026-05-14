@@ -1,0 +1,31 @@
+.DS_Store
+.claude/*
+!.claude/commands/
+
+*.zip
+
+# Chatbot runtime state (per-deployment, not for source control)
+wiki/chat_log.json
+wiki/chat_log.json.tmp
+
+.env
+.env.local
+
+# Node / monorepo
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Python / uv local build artifacts
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local scratch / audit notes
+engine/scratch/
+.agents/skills/research-tools/scripts/output/
+
+# Tool caches
+.firecrawl/
+.claude/projects/

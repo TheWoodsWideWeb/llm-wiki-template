@@ -1,0 +1,43 @@
+[project]
+name = "tools"
+version = "0.1.0"
+description = "System-level CLI tools for data acquisition"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "requests>=2.31.0",
+    "ytscrape @ git+https://github.com/BasedEdge/ytscrape.git",
+    "python-dotenv>=1.0.0",
+    "agentmail>=0.2.23",
+    "python-docx>=1.2.0",
+]
+
+[project.scripts]
+google-search = "tools.google_search:main"
+google-search-light = "tools.google_search_light:main"
+google-news = "tools.google_news:main"
+google-trends = "tools.google_trends:main"
+youtube-search = "tools.youtube_search:main"
+youtube-transcribe = "tools.youtube_transcribe:main"
+web-scrape = "tools.web_scrape:main"
+x-search = "tools.x_search:main"
+reddit-search = "tools.reddit_search:main"
+perplexity-search = "tools.perplexity_search:main"
+fear-greed = "tools.fear_greed:main"
+word-count = "tools.word_count:main"
+renumber-refs = "tools.renumber_refs:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tools"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Rounded shield/drop shape — wellness feel -->
+  <rect x="3" y="3" width="26" height="26" rx="8" fill="#436443"/>
+  <!-- Stylized "W" made of two gentle curves — like a smile/wave -->
+  <path d="M8 12 L11.5 21 L16 14 L20.5 21 L24 12"
+        stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Small dot above — like a sun/spark of dopamine -->
+  <circle cx="16" cy="8.5" r="1.8" fill="#e69a3e"/>
+</svg>

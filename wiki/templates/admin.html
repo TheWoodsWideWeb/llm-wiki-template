@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Chat log</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+  .thread-body { display: none; }
+  .thread-body.open { display: block; }
+  .msg-content { word-wrap: break-word; color: #1f2937; line-height: 1.6; font-size: 0.875rem; }
+  .msg-content p { margin: 0 0 0.6em 0; }
+  .msg-content p:last-child { margin-bottom: 0; }
+  .msg-content ul, .msg-content ol { margin: 0 0 0.6em 0; padding-left: 1.25rem; }
+  .msg-content ul { list-style: disc; }
+  .msg-content ol { list-style: decimal; }
+  .msg-content li { margin-bottom: 0.3em; }
+  .msg-content li > ul, .msg-content li > ol { margin-top: 0.3em; margin-bottom: 0; }
+  .msg-content strong { color: #111827; font-weight: 600; }
+  .msg-content em { color: #374151; }
+  .msg-content a { color: #436443; text-decoration: underline; text-underline-offset: 2px; }
+  .msg-content a:hover { color: #365136; }
+  .msg-content code { background: #f3f4f6; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.8125rem; color: #b86a15; }
+  .msg-content pre { background: #1f2937; color: #e5e7eb; padding: 0.75rem 1rem; border-radius: 8px; overflow-x: auto; margin: 0 0 0.6em 0; font-size: 0.8125rem; }
+  .msg-content pre code { background: none; padding: 0; color: inherit; }
+  .msg-content h1, .msg-content h2, .msg-content h3, .msg-content h4 { font-weight: 700; color: #111827; margin: 0.8em 0 0.35em; line-height: 1.3; }
+  .msg-content h1 { font-size: 1.125rem; }
+  .msg-content h2 { font-size: 1rem; }
+  .msg-content h3 { font-size: 0.9375rem; }
+  .msg-content h4 { font-size: 0.875rem; color: #374151; }
+  .msg-content blockquote { border-left: 3px solid #d4841e; padding: 0.4rem 0.9rem; margin: 0.6em 0; background: #fdf8f0; border-radius: 0 6px 6px 0; color: #7a4216; }
+  .msg-content blockquote p { margin: 0; }
+  .msg-content table { width: 100%; border-collapse: collapse; margin: 0.6em 0; font-size: 0.8125rem; }
+  .msg-content th { background: #f9fafb; padding: 0.4rem 0.6rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e5e7eb; }
+  .msg-content td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #f3f4f6; }
+  .msg-content hr { border: none; border-top: 1px solid #e5e7eb; margin: 1em 0; }
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<header class="bg-white border-b border-gray-200">
+  <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <img src="/static/favicon.svg" alt="" class="w-7 h-7">
+      <span class="text-lg font-bold" style="color:#365136;">{{ wiki_name }} Admin</span>
+      <span class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background:#f4f7f4;color:#567d56;">Chat log</span>
+    </div>
+    <div class="flex items-center gap-3 text-sm">
+      <a href="/" class="text-gray-600 hover:text-gray-900">Wiki →</a>
+      <a href="/admin/logout" class="text-gray-500 hover:text-red-600">Logout</a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-8">
+  <div class="mb-6 flex items-end justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Chat log</h1>
+      <p class="text-sm text-gray-500 mt-1">Archived Q+A from the wiki chat widget and terminal sessions.</p>
+    </div>
+    <div class="flex items-center gap-2 text-sm">
+      <a href="/admin" class="px-3 py-1.5 rounded-lg border"
+         style="{% if not active_source %}border-color:#759a75;background-color:#f4f7f4;color:#365136;font-weight:600;{% else %}border-color:#e5e7eb;background:white;color:#4b5563;{% endif %}">
+        All <span class="text-xs opacity-70">({{ counts.frontend + counts.backend }})</span>
+      </a>
+      <a href="/admin?source=frontend" class="px-3 py-1.5 rounded-lg border"
+         style="{% if active_source == 'frontend' %}border-color:#759a75;background-color:#f4f7f4;color:#365136;font-weight:600;{% else %}border-color:#e5e7eb;background:white;color:#4b5563;{% endif %}">
+        Frontend <span class="text-xs opacity-70">({{ counts.frontend }})</span>
+      </a>
+      <a href="/admin?source=backend" class="px-3 py-1.5 rounded-lg border"
+         style="{% if active_source == 'backend' %}border-color:#e69a3e;background-color:#fdf8f0;color:#7a4216;font-weight:600;{% else %}border-color:#e5e7eb;background:white;color:#4b5563;{% endif %}">
+        Backend <span class="text-xs opacity-70">({{ counts.backend }})</span>
+      </a>
+    </div>
+  </div>
+
+  {% if not threads %}
+  <div class="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-500">
+    <p class="font-medium mb-1">No threads yet.</p>
+    <p class="text-sm">Frontend chats land here automatically. Backend queries can be logged via <code class="px-1.5 py-0.5 bg-gray-100 rounded text-xs">python -m wiki.log_qa</code>.</p>
+  </div>
+  {% else %}
+  <div class="space-y-3">
+    {% for t in threads %}
+    <article class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <header class="px-5 py-3.5 flex items-start justify-between gap-4 cursor-pointer hover:bg-gray-50"
+              onclick="document.getElementById('thread-{{ t.id }}').classList.toggle('open'); document.getElementById('caret-{{ t.id }}').classList.toggle('rotate-90');">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            {% if t.source == 'frontend' %}
+            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style="background:#f4f7f4;color:#365136;">Frontend</span>
+            {% else %}
+            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style="background:#fdf8f0;color:#7a4216;">Backend</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">{{ t.updated }}</span>
+            <span class="text-xs text-gray-400">·</span>
+            <span class="text-xs text-gray-400">{{ t.messages | length // 2 }} Q/A</span>
+            {% if t.page %}
+              <span class="text-xs text-gray-400">·</span>
+              <a href="{{ t.page }}" class="text-xs hover:underline" style="color:#567d56;" onclick="event.stopPropagation()">{{ t.page }}</a>
+            {% endif %}
+          </div>
+          <h2 class="text-sm font-semibold text-gray-900 truncate">{{ t.title }}</h2>
+        </div>
+        <svg id="caret-{{ t.id }}" class="w-4 h-4 text-gray-400 transition-transform flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </header>
+      <div id="thread-{{ t.id }}" class="thread-body border-t border-gray-100">
+        <div class="p-5 space-y-4">
+          {% for msg in t.messages %}
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                 style="{% if msg.role == 'user' %}background:#e3ebe3;color:#365136;{% else %}background:#faecd6;color:#7a4216;{% endif %}">
+              {% if msg.role == 'user' %}Q{% else %}A{% endif %}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">{{ msg.role }} — {{ msg.ts }}</div>
+              <div class="msg-content">{{ msg.html | safe if msg.html is defined else msg.content }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <footer class="px-5 py-2.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+          <span>ID: <code class="px-1.5 py-0.5 bg-white rounded border border-gray-200">{{ t.id }}</code> · created {{ t.created }}</span>
+          <form method="post" action="/admin/thread/{{ t.id }}/delete"
+                onsubmit="return confirm('Delete this thread? Cannot be undone.');">
+            <button type="submit" class="text-gray-400 hover:text-red-600 font-medium">Delete</button>
+          </form>
+        </footer>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="mt-8 text-xs text-gray-400">
+    <p>Backend logging from terminal: <code class="px-1.5 py-0.5 bg-gray-100 rounded">python -m wiki.log_qa --question "..." --answer "..."</code></p>
+    <p>Append to existing thread: add <code class="px-1.5 py-0.5 bg-gray-100 rounded">--thread-id {THREAD_ID}</code></p>
+  </div>
+</main>
+
+</body>
+</html>

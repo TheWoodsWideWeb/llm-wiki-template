@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ wiki_name }} Wiki{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-black text-gray-900 mb-2">{{ wiki_name }} Knowledge Base</h1>
+    <p class="text-gray-500">{{ wiki_tagline }}</p>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div class="text-2xl font-bold text-sage-700">{{ total_pages }}</div>
+        <div class="text-xs font-medium text-gray-400 uppercase tracking-wide mt-1">Wiki Pages</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div class="text-2xl font-bold text-sage-700">{{ nav | length }}</div>
+        <div class="text-xs font-medium text-gray-400 uppercase tracking-wide mt-1">Sections</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <a href="/all" class="block">
+            <div class="text-2xl font-bold text-brand-600">Browse →</div>
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wide mt-1">All pages</div>
+        </a>
+    </div>
+</div>
+
+<!-- Search (mobile) -->
+<form action="/search" method="get" class="sm:hidden mb-8">
+    <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" name="q" placeholder="Search wiki..."
+               class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-300">
+    </div>
+</form>
+
+{% if not nav %}
+<div class="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
+    <h2 class="text-lg font-semibold text-gray-700 mb-2">The wiki is empty.</h2>
+    <p class="text-sm text-gray-500 mb-4">No pages exist yet. To populate the wiki:</p>
+    <ol class="text-sm text-gray-600 max-w-md mx-auto space-y-1.5 text-left list-decimal list-inside">
+        <li>Drop raw sources into <code class="px-1.5 py-0.5 bg-gray-100 rounded text-xs">raw/staging/&lt;topic&gt;/</code></li>
+        <li>Move reviewed sources to <code class="px-1.5 py-0.5 bg-gray-100 rounded text-xs">raw/approved/</code></li>
+        <li>Run <code class="px-1.5 py-0.5 bg-gray-100 rounded text-xs">/ingest</code> in Claude Code</li>
+    </ol>
+</div>
+{% else %}
+<!-- Sections grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for section_key, section_data in nav.items() %}
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="font-semibold text-gray-900">{{ section_data.label }}</h2>
+            <span class="text-xs font-medium text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">{{ section_counts[section_key] }}</span>
+        </div>
+        <ul class="space-y-1">
+            {% for p in section_data.pages[:8] %}
+            <li>
+                <a href="{{ p.url }}" class="text-sm text-gray-600 hover:text-sage-700 hover:underline truncate block">
+                    {{ p.title }}
+                </a>
+            </li>
+            {% endfor %}
+            {% if section_data.pages | length > 8 %}
+            <li class="text-xs text-gray-400 italic pl-0 pt-1">+ {{ section_data.pages | length - 8 }} more</li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

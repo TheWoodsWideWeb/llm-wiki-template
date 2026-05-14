@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — {{ wiki_name }} Wiki</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center font-sans" style="font-family:'Inter',system-ui,-apple-system,sans-serif;">
+<div class="w-full max-w-sm bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+  <div class="flex items-center gap-2.5 mb-6">
+    <img src="/static/favicon.svg" alt="" class="w-7 h-7">
+    <div>
+      <div class="text-lg font-bold" style="color:#365136;">{{ wiki_name }} Admin</div>
+      <div class="text-xs text-gray-500">Chat log &amp; query archive</div>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="mb-4 px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">{{ error }}</div>
+  {% endif %}
+
+  <form method="post" class="space-y-4">
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Username</label>
+      <input type="text" name="username" autofocus required autocomplete="username"
+             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sage-300"
+             style="--tw-ring-color:#a1bba1;">
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Password</label>
+      <input type="password" name="password" required autocomplete="current-password"
+             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sage-300">
+    </div>
+    <button type="submit"
+            class="w-full py-2 rounded-lg text-sm font-semibold text-white transition"
+            style="background-color:#567d56;" onmouseover="this.style.backgroundColor='#365136'" onmouseout="this.style.backgroundColor='#567d56'">
+      Sign in
+    </button>
+  </form>
+
+  <div class="mt-6 text-center">
+    <a href="/" class="text-xs text-gray-500 hover:text-gray-700">← Back to wiki</a>
+  </div>
+</div>
+</body>
+</html>

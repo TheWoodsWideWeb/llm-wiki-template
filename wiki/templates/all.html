@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}All pages — {{ wiki_name }} Wiki{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+  <div class="mb-6 flex items-end justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">All pages</h1>
+      <p class="text-sm text-gray-500 mt-1">{{ total }} page{{ 's' if total != 1 else '' }} across every section.</p>
+    </div>
+    <div class="flex items-center gap-2 text-sm">
+      <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold mr-1">Sort</span>
+      {% set qs = '&section=' + section_filter if section_filter else '' %}
+      <a href="/all?sort=recent{{ qs }}"
+         class="px-3 py-1.5 rounded-lg border {% if sort == 'recent' %}font-semibold{% endif %}"
+         style="{% if sort == 'recent' %}border-color:#759a75;background-color:#f4f7f4;color:#365136;{% else %}border-color:#e5e7eb;background:white;color:#4b5563;{% endif %}">
+        Recent
+      </a>
+      <a href="/all?sort=oldest{{ qs }}"
+         class="px-3 py-1.5 rounded-lg border {% if sort == 'oldest' %}font-semibold{% endif %}"
+         style="{% if sort == 'oldest' %}border-color:#759a75;background-color:#f4f7f4;color:#365136;{% else %}border-color:#e5e7eb;background:white;color:#4b5563;{% endif %}">
+        Oldest
+      </a>
+      <a href="/all?sort=title{{ qs }}"
+         class="px-3 py-1.5 rounded-lg border {% if sort == 'title' %}font-semibold{% endif %}"
+         style="{% if sort == 'title' %}border-color:#759a75;background-color:#f4f7f4;color:#365136;{% else %}border-color:#e5e7eb;background:white;color:#4b5563;{% endif %}">
+        Title
+      </a>
+      <a href="/all?sort=section{{ qs }}"
+         class="px-3 py-1.5 rounded-lg border {% if sort == 'section' %}font-semibold{% endif %}"
+         style="{% if sort == 'section' %}border-color:#759a75;background-color:#f4f7f4;color:#365136;{% else %}border-color:#e5e7eb;background:white;color:#4b5563;{% endif %}">
+        Section
+      </a>
+    </div>
+  </div>
+
+  <div class="mb-4 flex items-center gap-2 flex-wrap">
+    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Filter</span>
+    <a href="/all?sort={{ sort }}" class="px-2.5 py-1 rounded-full text-xs border {% if not section_filter %}font-semibold{% endif %}"
+       style="{% if not section_filter %}border-color:#759a75;background:#f4f7f4;color:#365136;{% else %}border-color:#e5e7eb;background:white;color:#6b7280;{% endif %}">All</a>
+    {% for key, label in section_labels.items() %}
+    <a href="/all?sort={{ sort }}&section={{ key }}" class="px-2.5 py-1 rounded-full text-xs border {% if section_filter == key %}font-semibold{% endif %}"
+       style="{% if section_filter == key %}border-color:#759a75;background:#f4f7f4;color:#365136;{% else %}border-color:#e5e7eb;background:white;color:#6b7280;{% endif %}">{{ label }}</a>
+    {% endfor %}
+  </div>
+
+  {% if not rows %}
+  <div class="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-500">
+    No pages match this filter.
+  </div>
+  {% else %}
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-gray-50 border-b border-gray-200">
+          <th class="text-left px-5 py-2.5 font-semibold text-gray-700 text-xs uppercase tracking-wider">Page</th>
+          <th class="text-left px-5 py-2.5 font-semibold text-gray-700 text-xs uppercase tracking-wider">Section</th>
+          <th class="text-left px-5 py-2.5 font-semibold text-gray-700 text-xs uppercase tracking-wider whitespace-nowrap">Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr class="border-b border-gray-100 hover:bg-gray-50">
+          <td class="px-5 py-2.5"><a href="{{ r.url }}" class="font-medium" style="color:#365136;">{{ r.title }}</a></td>
+          <td class="px-5 py-2.5"><a href="/all?sort={{ sort }}&section={{ r.section }}" class="text-xs px-2 py-0.5 rounded-full" style="background:#f4f7f4;color:#567d56;">{{ r.section_label }}</a></td>
+          <td class="px-5 py-2.5 text-gray-500 text-xs whitespace-nowrap">{{ r.updated or r.created or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
