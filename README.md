@@ -33,9 +33,9 @@ git clone <your-repo-url> my-wiki
 cd my-wiki
 
 # Install Python deps (Flask + Anthropic SDK + markdown + yaml)
-pip install flask python-dotenv markdown pyyaml anthropic
+pip install -r requirements.txt
 
-# Copy env file and fill in at least ANTHROPIC_API_KEY
+# Copy env template and fill in at least ANTHROPIC_API_KEY
 cp .env.example .env
 $EDITOR .env
 ```

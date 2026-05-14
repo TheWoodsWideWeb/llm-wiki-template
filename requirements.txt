@@ -1,0 +1,11 @@
+# Wiki frontend + chatbot dependencies.
+# Install with: pip install -r requirements.txt
+#
+# Research toolchain dependencies are managed separately via uv —
+# see .agents/skills/research-tools/scripts/pyproject.toml.
+
+flask>=3.0
+python-dotenv>=1.0
+markdown>=3.5
+pyyaml>=6.0
+anthropic>=0.40
